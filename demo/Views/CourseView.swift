@@ -26,6 +26,9 @@ struct CourseView: View {
                     .padding(.bottom, 200)
                     .opacity(apper[2] ? 1 : 0)
             }
+            .coordinateSpace(name: "scroll")
+            .onAppear{ model.showDetail = true }
+            .onDisappear{ model.showDetail = false }
             .background(Color("Background"))
             
             // gesture effect start
@@ -79,7 +82,7 @@ struct CourseView: View {
     
     var cover: some View{
         GeometryReader { proxy in
-            let scrollY = proxy.frame(in: .global).minY //用于视差
+            let scrollY = proxy.frame(in: .named("scroll")).minY //用于视差
             VStack {
                 Spacer()
             }

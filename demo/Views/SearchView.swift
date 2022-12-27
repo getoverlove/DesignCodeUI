@@ -9,6 +9,9 @@ import SwiftUI
 
 struct SearchView: View {
     @State var text = ""
+    @State var show = false
+    @Namespace var namespace
+    @State var selectedIndex = 0
     @Environment(\.presentationMode) var presentationMode  //用于sheet跳转过来后再取消
     var body: some View {
         NavigationView {
@@ -58,34 +61,49 @@ struct SearchView: View {
             } label: {
                 Text("Done").bold()
             })
+            .sheet(isPresented: $show) {
+                CourseView(namespace: namespace, course: courses[selectedIndex], show: $show)
+            }
         }
     }
     
     var content: some View{
-        ForEach(courses.filter { $0.title.contains(text)  //$0表示第一个值，包含text字段就显示
-            || text == ""}) //或者什么都没填，显示所有
-        { item in
-            HStack(alignment: .top, spacing: 12) {
-                Image(item.image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 44, height: 44)
-                    .background(Color("Backgroud"))
-                    .mask(Circle())
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.title)
-                    Text(item.text)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .multilineTextAlignment(.leading) //多行文字对齐3
-                    
+        ForEach(Array(courses.enumerated()), id: \.offset) //??
+        { index, item in
+            if item.title.contains(text) || text == "" { //或者什么都没填，显示所有
+                if index != 0
+                {
+                    Divider()
                 }
+                Button{
+                    show = true
+                    selectedIndex = index
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(item.image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 44, height: 44)
+                            .background(Color("Backgroud"))
+                            .mask(Circle())
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.title).bold()
+                                .foregroundColor(.primary)
+                            Text(item.text)
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .multilineTextAlignment(.leading) //多行文字对齐3
+                            
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 15)
+                .listRowSeparator(.hidden)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 15)
-            .listRowSeparator(.hidden)
+            }
+            
         }
     }
 }
